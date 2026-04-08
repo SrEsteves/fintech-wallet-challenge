@@ -15,8 +15,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/transfer', [TransactionController::class, 'transfer']);
     Route::get('/transactions', [TransactionController::class, 'history']);
 });
-
-Route::get('/setup', function () {
-    Artisan::call('db:seed', ['--force' => true]);
-    return response()->json(['message' => 'Banco populado com sucesso! Pode testar o login.']);
-});
