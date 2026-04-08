@@ -36,11 +36,19 @@ MVP de uma carteira digital P2P onde usuários podem enviar e receber dinheiro e
 Para validar as regras de negócio e a segurança das operações:
 `./vendor/bin/sail artisan test`
 
-## Credenciais para Teste (Seed)
-Utilize estas credenciais para testar as funcionalidades imediatamente após rodar os seeders:
+## Credenciais para Teste
+
+Utilize estas credenciais para testar as funcionalidades imediatamente na versão em produção ou após rodar os seeders localmente:
+
+**Conta Principal (Com saldo):**
 - **E-mail**: `teste@teck.com`
 - **Senha**: `password`
 - **Saldo Inicial**: R$ 1.000,00
+
+**Conta de Destino (Para testar o envio de dinheiro):**
+- **E-mail**: `recebedor@teck.com`
+- **Senha**: `password`
+- **Saldo Inicial**: R$ 0,00
 
 ## Link do Deploy
 https://fintech-wallet-challenge-five.vercel.app/login
