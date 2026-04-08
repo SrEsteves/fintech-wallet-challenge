@@ -38,132 +38,169 @@ onMounted(() => {
 
 <template>
   <div class="dashboard">
-    <h2>Bem-vindo(a), {{ authStore.user?.name }}</h2>
+    <header class="dashboard-header">
+      <h2>Bem-vindo(a), <span>{{ authStore.user?.name }}</span></h2>
+      <p class="text-muted">Acompanhe seu saldo e movimentações recentes.</p>
+    </header>
     
-    <div class="balance-card">
+    <div class="card balance-card">
       <h3>Saldo Atual</h3>
       <p class="balance-amount" v-if="authStore.user?.wallet">
         {{ formatCurrency(authStore.user.wallet.balance) }}
       </p>
-      <p v-else>Carregando...</p>
+      <div v-else class="loading-pulse">Carregando saldo...</div>
     </div>
 
-    <div class="transactions-section">
-      <h3>Últimas 5 Transações</h3>
+    <div class="card mt-lg">
+      <h3 class="section-title">Últimas Movimentações</h3>
       
-      <div v-if="isLoading">Buscando transações...</div>
+      <div v-if="isLoading" class="text-center text-muted mt-md">
+        Buscando transações...
+      </div>
       
-      <table v-else-if="recentTransactions.length > 0" class="data-table">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Tipo</th>
-            <th>Usuário</th>
-            <th>Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="txn in recentTransactions" :key="txn.id">
-            <td>{{ formatDate(txn.created_at) }}</td>
-            <td>
-              <span :class="txn.type === 'credit' ? 'badge-credit' : 'badge-debit'">
-                {{ txn.type === 'credit' ? 'Recebido' : 'Enviado' }}
-              </span>
-            </td>
-            <td>{{ txn.related_user?.name || 'Desconhecido' }}</td>
-            <td :class="txn.type === 'credit' ? 'text-credit' : 'text-debit'">
-              {{ txn.type === 'credit' ? '+' : '-' }} {{ formatCurrency(txn.amount) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-else-if="recentTransactions.length > 0" class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Tipo</th>
+              <th>Usuário</th>
+              <th class="text-right">Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="txn in recentTransactions" :key="txn.id">
+              <td class="text-muted">{{ formatDate(txn.created_at) }}</td>
+              <td>
+                <span class="badge" :class="txn.type === 'credit' ? 'badge-credit' : 'badge-debit'">
+                  {{ txn.type === 'credit' ? 'Recebido' : 'Enviado' }}
+                </span>
+              </td>
+              <td>{{ txn.related_user?.name || 'Desconhecido' }}</td>
+              <td class="text-right" :class="txn.type === 'credit' ? 'text-credit' : 'text-debit'">
+                {{ txn.type === 'credit' ? '+' : '-' }} {{ formatCurrency(txn.amount) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       
-      <p v-else class="empty-state">Você ainda não possui transações.</p>
+      <p v-else class="text-center text-muted mt-md">Você ainda não possui transações.</p>
     </div>
   </div>
 </template>
 
 <style scoped>
-.dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+.dashboard-header {
+  margin-bottom: var(--spacing-lg);
 }
 
+.dashboard-header h2 {
+  color: var(--vt-c-indigo);
+  font-weight: 700;
+}
+
+.dashboard-header span {
+  color: var(--color-primary);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+/* Modificando o card do base.css apenas para o Saldo */
 .balance-card {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: linear-gradient(135deg, var(--vt-c-indigo) 0%, #1a252f 100%);
   color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   text-align: center;
+  border: none;
 }
 
 .balance-card h3 {
-  margin: 0 0 1rem 0;
-  font-weight: normal;
+  font-weight: 500;
   opacity: 0.9;
+  font-size: 1.1rem;
 }
 
 .balance-amount {
   font-size: 2.5rem;
-  font-weight: bold;
-  margin: 0;
+  font-weight: 700;
+  margin-top: var(--spacing-sm);
 }
 
-.transactions-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+.section-title {
+  color: var(--vt-c-indigo);
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.table-responsive {
+  overflow-x: auto;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
 }
 
 .data-table th, .data-table td {
-  padding: 1rem;
+  padding: var(--spacing-md);
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.95rem;
 }
 
 .data-table th {
-  background-color: #f8f9fa;
+  color: var(--color-text-muted);
   font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+/* Estilização das Badges usando rgba para fundo suave e cor sólida no texto */
+.badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .badge-credit {
-  background-color: #d4edda;
-  color: #155724;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
+  background-color: rgba(40, 167, 69, 0.1); /* Transparência sobre a cor primária */
+  color: var(--color-primary);
 }
 
 .badge-debit {
-  background-color: #f8d7da;
-  color: #721c24;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
+  background-color: rgba(220, 53, 69, 0.1); /* Transparência sobre a cor danger */
+  color: var(--color-danger);
 }
 
 .text-credit {
-  color: #28a745;
-  font-weight: bold;
+  color: var(--color-primary);
+  font-weight: 700;
 }
 
 .text-debit {
-  color: #dc3545;
-  font-weight: bold;
+  color: var(--color-danger);
+  font-weight: 700;
 }
 
-.empty-state {
-  text-align: center;
-  color: #6c757d;
-  padding: 2rem 0;
+/* Pequena animação enquanto carrega o saldo */
+.loading-pulse {
+  animation: pulse 1.5s infinite;
+  opacity: 0.7;
+  margin-top: var(--spacing-sm);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }
 </style>

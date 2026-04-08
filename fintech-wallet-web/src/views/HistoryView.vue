@@ -52,13 +52,16 @@ onMounted(fetchHistory);
 </script>
 
 <template>
-  <div class="history-container">
-    <h2>Histórico de Transações</h2>
+  <div class="card history-card">
+    <header class="history-header">
+      <h2 class="section-title">Histórico de Transações</h2>
+      <p class="text-muted">Acompanhe todas as suas entradas e saídas.</p>
+    </header>
 
-    <div class="filters-bar">
+    <div class="filters-bar mt-md">
       <div class="filter-group">
         <label>Tipo</label>
-        <select v-model="filters.type">
+        <select v-model="filters.type" class="form-control">
           <option value="">Todos</option>
           <option value="credit">Recebidos (Crédito)</option>
           <option value="debit">Enviados (Débito)</option>
@@ -67,135 +70,219 @@ onMounted(fetchHistory);
 
       <div class="filter-group">
         <label>De:</label>
-        <input type="date" v-model="filters.start_date" />
+        <input type="date" v-model="filters.start_date" class="form-control" />
       </div>
 
       <div class="filter-group">
         <label>Até:</label>
-        <input type="date" v-model="filters.end_date" />
+        <input type="date" v-model="filters.end_date" class="form-control" />
       </div>
     </div>
 
-    <div v-if="isLoading" class="loader">Carregando transações...</div>
+    <div v-if="isLoading" class="text-center text-muted mt-lg loading-pulse">
+      Carregando transações...
+    </div>
 
-    <div v-else>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Tipo</th>
-            <th>Usuário Relacionado</th>
-            <th>Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="txn in transactions" :key="txn.id">
-            <td>{{ formatDate(txn.created_at) }}</td>
-            <td>
-              <span :class="txn.type === 'credit' ? 'badge-credit' : 'badge-debit'">
-                {{ txn.type === 'credit' ? 'Crédito' : 'Débito' }}
-              </span>
-            </td>
-            <td>
-              {{ txn.related_user?.name }} <br/>
-              <small>{{ txn.related_user?.email }}</small>
-            </td>
-            <td :class="txn.type === 'credit' ? 'text-credit' : 'text-debit'">
-              {{ txn.type === 'credit' ? '+' : '-' }} {{ formatCurrency(txn.amount) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-else class="mt-md">
+      <div class="table-responsive" v-if="transactions.length > 0">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Tipo</th>
+              <th>Usuário Relacionado</th>
+              <th class="text-right">Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="txn in transactions" :key="txn.id">
+              <td class="text-muted">{{ formatDate(txn.created_at) }}</td>
+              <td>
+                <span class="badge" :class="txn.type === 'credit' ? 'badge-credit' : 'badge-debit'">
+                  {{ txn.type === 'credit' ? 'Crédito' : 'Débito' }}
+                </span>
+              </td>
+              <td>
+                <strong>{{ txn.related_user?.name || 'Desconhecido' }}</strong> <br/>
+                <small class="text-muted">{{ txn.related_user?.email || '-' }}</small>
+              </td>
+              <td class="text-right" :class="txn.type === 'credit' ? 'text-credit' : 'text-debit'">
+                {{ txn.type === 'credit' ? '+' : '-' }} {{ formatCurrency(txn.amount) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <div class="pagination" v-if="pagination.last_page > 1">
+      <div v-if="transactions.length === 0" class="text-center text-muted mt-lg">
+        Nenhuma transação encontrada para os filtros selecionados.
+      </div>
+
+      <div class="pagination mt-lg" v-if="pagination.last_page > 1">
         <button 
+          class="btn-outline"
           :disabled="filters.page === 1" 
           @click="changePage(filters.page - 1)"
         >Anterior</button>
         
-        <span>Página {{ filters.page }} de {{ pagination.last_page }}</span>
+        <span class="page-info">Página {{ filters.page }} de {{ pagination.last_page }}</span>
 
         <button 
+          class="btn-outline"
           :disabled="filters.page === pagination.last_page" 
           @click="changePage(filters.page + 1)"
         >Próxima</button>
-      </div>
-
-      <div v-if="transactions.length === 0" class="empty">
-        Nenhuma transação encontrada para os filtros selecionados.
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.history-container {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+.history-card {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.history-header {
+  margin-bottom: var(--spacing-md);
+}
+
+.section-title {
+  color: var(--vt-c-indigo);
+  font-weight: 700;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-right {
+  text-align: right !important;
 }
 
 .filters-bar {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 4px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-background-soft);
+  border-radius: var(--radius);
   flex-wrap: wrap;
+  align-items: flex-end;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 200px;
 }
 
 .filter-group label {
-  font-size: 0.8rem;
-  font-weight: bold;
-  color: #666;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--vt-c-indigo);
 }
 
-.filter-group select, .filter-group input {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+.form-control {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.table-responsive {
+  overflow-x: auto;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: var(--spacing-md);
 }
 
 .data-table th, .data-table td {
-  padding: 1rem;
+  padding: var(--spacing-md);
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.95rem;
 }
 
-.badge-credit { background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; }
-.badge-debit { background: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; }
-.text-credit { color: #28a745; font-weight: bold; }
-.text-debit { color: #dc3545; font-weight: bold; }
+.data-table th {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-credit {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: var(--color-primary);
+}
+
+.badge-debit {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--color-danger);
+}
+
+.text-credit {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.text-debit {
+  color: var(--color-danger);
+  font-weight: 700;
+}
 
 .pagination {
-  margin-top: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-md);
 }
 
-.pagination button {
-  padding: 0.5rem 1rem;
-  cursor: pointer;
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--vt-c-indigo);
+  color: var(--vt-c-indigo);
+  font-weight: 600;
 }
 
-.loader, .empty {
-  text-align: center;
-  padding: 3rem;
-  color: #666;
+.btn-outline:hover:not(:disabled) {
+  background: var(--vt-c-indigo);
+  color: white;
+}
+
+.page-info {
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.loading-pulse {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }
 </style>

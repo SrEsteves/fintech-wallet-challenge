@@ -39,15 +39,14 @@ const submitLogin = async () => {
 </script>
 
 <template>
-  <div class="login-box">
-    <h2>Login - Teck Wallet</h2>
+  <div class="card auth-card">
+    <h2 class="form-title text-center">Login - Teck Wallet</h2>
     
-    <!-- erro -->
-    <div v-if="localError" class="error-msg">
+    <div v-if="localError" class="alert alert-error mt-md">
       {{ localError }}
     </div>
 
-    <form @submit.prevent="submitLogin">
+    <form @submit.prevent="submitLogin" class="mt-md">
       <div class="form-group">
         <label>E-mail</label>
         <input 
@@ -68,83 +67,69 @@ const submitLogin = async () => {
         />
       </div>
 
-      <button type="submit" :disabled="isLoading">
+      <button type="submit" class="btn-primary w-100 mt-md" :disabled="isLoading">
         <span v-if="isLoading">Entrando...</span>
         <span v-else>Entrar</span>
       </button>
     </form>
     
-    <p class="register-link">
+    <p class="register-link mt-md">
       Não tem conta? <RouterLink to="/register">Cadastre-se</RouterLink>
     </p>
   </div>
 </template>
 
 <style scoped>
-.login-box {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+.auth-card {
   max-width: 400px;
   margin: 0 auto;
 }
 
+.form-title {
+  color: var(--vt-c-indigo);
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-md);
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  color: var(--vt-c-indigo);
+  font-size: 0.9rem;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
+/* O base.css formata inputs globalmente, tratamos apenas o estado :disabled aqui */
 .form-group input:disabled {
-  background-color: #f5f5f5;
+  background-color: var(--color-background-soft);
   cursor: not-allowed;
 }
 
-button {
+.w-100 {
   width: 100%;
-  padding: 0.75rem;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-button:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-button:disabled {
-  background-color: #6c757d;
-}
-
-.error-msg {
-  color: #dc3545;
-  background-color: #f8d7da;
-  padding: 0.5rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  text-align: center;
+  padding: 0.8rem;
+  font-weight: 600;
 }
 
 .register-link {
   text-align: center;
-  margin-top: 1rem;
   font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.register-link a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+  opacity: 0.8;
 }
 </style>

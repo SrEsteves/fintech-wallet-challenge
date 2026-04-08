@@ -24,10 +24,11 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="auth-box">
-    <h2>Criar Conta - Teck Wallet</h2>
+  <div class="card auth-card">
+    <h2 class="form-title text-center">Criar Conta</h2>
+    <p class="text-center text-muted mb-lg">Bem-vindo(a) à Teck Wallet</p>
 
-    <div v-if="authStore.error" class="error-msg">
+    <div v-if="authStore.error" class="alert alert-error mt-md">
       {{ authStore.error }}
     </div>
 
@@ -47,66 +48,70 @@ const handleRegister = async () => {
         <input type="password" v-model="password" required placeholder="Mínimo 8 caracteres" />
       </div>
 
-      <button type="submit" :disabled="isLoading">
+      <button type="submit" class="btn-primary w-100 mt-md" :disabled="isLoading">
         {{ isLoading ? 'Cadastrando...' : 'Criar Minha Conta' }}
       </button>
     </form>
 
-    <p class="login-link">
+    <p class="login-link mt-md">
       Já tem uma conta? <RouterLink to="/login">Faça login</RouterLink>
     </p>
   </div>
 </template>
 
 <style scoped>
-.auth-box {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+.auth-card {
   max-width: 400px;
   margin: 0 auto;
 }
-.form-group {
-  margin-bottom: 1rem;
+
+.form-title {
+  color: var(--vt-c-indigo);
+  font-weight: 700;
+  margin-bottom: 0.2rem;
 }
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  color: var(--vt-c-indigo);
+  font-size: 0.9rem;
 }
-.form-group input {
+
+.w-100 {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
+  padding: 0.8rem;
+  font-weight: 600;
 }
-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  font-weight: bold;
-}
-button:disabled {
-  background-color: #6c757d;
-}
-.error-msg {
-  color: #dc3545;
-  background-color: #f8d7da;
-  padding: 0.5rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  text-align: center;
-}
+
 .login-link {
   text-align: center;
-  margin-top: 1rem;
   font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.login-link a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+  opacity: 0.8;
 }
 </style>
