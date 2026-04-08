@@ -43,4 +43,4 @@ Utilize estas credenciais para testar as funcionalidades imediatamente após rod
 - **Saldo Inicial**: R$ 1.000,00
 
 ## Link do Deploy
-[PENDENTE - Adicione o link aqui após o deploy]
+https://fintech-wallet-challenge-five.vercel.app/login
