@@ -1,48 +1,76 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
-const email = ref('');
-const password = ref('');
-const isLoading = ref(false);
-const authStore = useAuthStore();
-const router = useRouter();
+const email = ref('')
+const password = ref('')
+const isLoading = ref(false)
+const localError = ref('')
+
+const authStore = useAuthStore()
+const router = useRouter()
 
 const submitLogin = async () => {
-  if (!email.value || !password.value) return;
-  
-  isLoading.value = true;
-  const success = await authStore.login(email.value, password.value);
-  isLoading.value = false;
+  localError.value = ''
+  authStore.error = ''
 
-  if (success) {
-    router.push('/');
+  if (!email.value || !password.value) {
+    localError.value = 'Preencha todos os campos.'
+    return
   }
-};
+
+  try {
+    isLoading.value = true
+
+    const success = await authStore.login(email.value, password.value)
+
+    if (success) {
+      router.push('/')
+    } else {
+      localError.value = authStore.error || 'Falha ao fazer login.'
+    }
+  } catch (error) {
+    localError.value = 'Erro inesperado. Tente novamente.'
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>
   <div class="login-box">
     <h2>Login - Teck Wallet</h2>
     
-    <div v-if="authStore.error" class="error-msg">
-      {{ authStore.error }}
+    <!-- erro -->
+    <div v-if="localError" class="error-msg">
+      {{ localError }}
     </div>
 
     <form @submit.prevent="submitLogin">
       <div class="form-group">
         <label>E-mail</label>
-        <input type="email" v-model="email" required placeholder="Digite seu e-mail" />
+        <input 
+          type="email" 
+          v-model="email" 
+          placeholder="Digite seu e-mail"
+          :disabled="isLoading"
+        />
       </div>
 
       <div class="form-group">
         <label>Senha</label>
-        <input type="password" v-model="password" required placeholder="Sua senha" />
+        <input 
+          type="password" 
+          v-model="password" 
+          placeholder="Sua senha"
+          :disabled="isLoading"
+        />
       </div>
 
       <button type="submit" :disabled="isLoading">
-        {{ isLoading ? 'Entrando...' : 'Entrar' }}
+        <span v-if="isLoading">Entrando...</span>
+        <span v-else>Entrar</span>
       </button>
     </form>
     
@@ -61,14 +89,17 @@ const submitLogin = async () => {
   max-width: 400px;
   margin: 0 auto;
 }
+
 .form-group {
   margin-bottom: 1rem;
 }
+
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
 }
+
 .form-group input {
   width: 100%;
   padding: 0.5rem;
@@ -76,6 +107,12 @@ const submitLogin = async () => {
   border-radius: 4px;
   box-sizing: border-box;
 }
+
+.form-group input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
 button {
   width: 100%;
   padding: 0.75rem;
@@ -85,10 +122,17 @@ button {
   border-radius: 4px;
   font-size: 1rem;
   cursor: pointer;
+  transition: 0.2s ease;
 }
+
+button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
 button:disabled {
   background-color: #6c757d;
 }
+
 .error-msg {
   color: #dc3545;
   background-color: #f8d7da;
@@ -97,6 +141,7 @@ button:disabled {
   margin-bottom: 1rem;
   text-align: center;
 }
+
 .register-link {
   text-align: center;
   margin-top: 1rem;

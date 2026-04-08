@@ -1,31 +1,54 @@
 <script setup>
-import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from './stores/auth';
+import { onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from './stores/auth'
 
-const authStore = useAuthStore();
-const router = useRouter();
+const authStore = useAuthStore()
+const router = useRouter()
 
-onMounted(() => {
-  if (authStore.token) {
-    authStore.fetchUser();
+const isAuthenticated = computed(() => !!authStore.token)
+const userName = computed(() => authStore.user?.name || '')
+
+onMounted(async () => {
+  // evita chamada desnecessária
+  if (authStore.token && !authStore.user) {
+    try {
+      await authStore.fetchUser()
+    } catch (e) {
+      // se o token for inválido, força logout
+      await authStore.logout()
+      router.push('/login')
+    }
   }
-});
+})
 
 const handleLogout = async () => {
-  await authStore.logout();
-  router.push('/login');
-};
+  try {
+    await authStore.logout()
+  } finally {
+    router.push('/login')
+  }
+}
 </script>
 
 <template>
   <div>
-    <header v-if="authStore.token" class="navbar">
-      <nav>
-        <RouterLink to="/">Dashboard</RouterLink> |
-        <RouterLink to="/transfer">Nova Transferência</RouterLink> |
-        <RouterLink to="/history">Histórico Completo</RouterLink> |
-        <a href="#" @click.prevent="handleLogout">Sair</a>
+    <header v-if="isAuthenticated" class="navbar">
+      <nav class="nav-content">
+        <div class="nav-left">
+          <RouterLink to="/">Dashboard</RouterLink>
+          <RouterLink to="/transfer">Nova Transferência</RouterLink>
+          <RouterLink to="/history">Histórico</RouterLink>
+        </div>
+
+        <div class="nav-right">
+          <span class="user-name" v-if="userName">
+            Olá, {{ userName }}
+          </span>
+          <button class="logout-btn" @click="handleLogout">
+            Sair
+          </button>
+        </div>
       </nav>
     </header>
 
@@ -42,22 +65,55 @@ body {
   margin: 0;
   padding: 0;
 }
+
 .navbar {
   background-color: #333;
   padding: 1rem;
-  text-align: center;
 }
-.navbar a {
+
+.nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-left a {
   color: white;
   text-decoration: none;
-  margin: 0 10px;
+  margin-right: 15px;
   font-weight: bold;
 }
-.navbar a:hover {
+
+.nav-left a:hover {
   text-decoration: underline;
 }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  color: #ddd;
+  font-size: 0.9rem;
+}
+
+.logout-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.7rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  opacity: 0.9;
+}
+
 .container {
-  max-width: 1200px;
+  width: 1200px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
