@@ -2,7 +2,7 @@
 
 MVP de uma carteira digital P2P onde usuários podem enviar e receber dinheiro entre si de forma simples e segura.
 
-## Decisões Técnicas (Nível Sênior)
+## Decisões Técnicas 
 
 - **Service Layer**: Toda a lógica de transferência foi isolada em `TransferService`, mantendo os controllers limpos e focados exclusivamente em orquestração de requisição/resposta.
 - **Atomicidade & Transações**: Implementação de `DB::transaction` para garantir a integridade dos dados (ACID). No driver MySQL, utilizei `lockForUpdate` para prevenir condições de corrida (race conditions) em acessos simultâneos ao saldo.
