@@ -12,7 +12,6 @@ const amount = ref('');
 const isLoading = ref(false);
 const message = ref({ type: '', text: '' });
 
-// Função para deixar o saldo bonitinho igual ao Dashboard
 const formatCurrency = (val) => {
   return parseFloat(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 };
@@ -93,9 +92,7 @@ const handleTransfer = async () => {
 </template>
 
 <style scoped>
-/* Aqui mantemos apenas o que é exclusivo desta tela. 
-  Inputs, botões e alertas foram apagados porque o base.css já resolve.
-*/
+
 .transfer-card {
   max-width: 500px;
   margin: 0 auto;
